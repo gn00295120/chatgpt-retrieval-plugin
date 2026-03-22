@@ -113,20 +113,27 @@ class PostgresClient(PGClient):
         """
 
         filters = "WHERE"
+        params = []
         if filter.document_id:
-            filters += f" document_id = '{filter.document_id}' AND"
+            filters += " document_id = %s AND"
+            params.append(filter.document_id)
         if filter.source:
-            filters += f" source = '{filter.source}' AND"
+            filters += " source = %s AND"
+            params.append(filter.source)
         if filter.source_id:
-            filters += f" source_id = '{filter.source_id}' AND"
+            filters += " source_id = %s AND"
+            params.append(filter.source_id)
         if filter.author:
-            filters += f" author = '{filter.author}' AND"
+            filters += " author = %s AND"
+            params.append(filter.author)
         if filter.start_date:
-            filters += f" created_at >= '{filter.start_date}' AND"
+            filters += " created_at >= %s AND"
+            params.append(filter.start_date)
         if filter.end_date:
-            filters += f" created_at <= '{filter.end_date}' AND"
+            filters += " created_at <= %s AND"
+            params.append(filter.end_date)
         filters = filters[:-4]
 
         with self.client.cursor() as cur:
-            cur.execute(f"DELETE FROM {table} {filters}")
+            cur.execute(f"DELETE FROM {table} {filters}", params)
             self.client.commit()

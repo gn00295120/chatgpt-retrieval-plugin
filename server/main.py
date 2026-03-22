@@ -1,4 +1,5 @@
 import os
+import secrets
 from typing import Optional
 import uvicorn
 from fastapi import FastAPI, File, Form, HTTPException, Depends, Body, UploadFile
@@ -25,7 +26,7 @@ assert BEARER_TOKEN is not None
 
 
 def validate_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
-    if credentials.scheme != "Bearer" or credentials.credentials != BEARER_TOKEN:
+    if credentials.scheme != "Bearer" or not secrets.compare_digest(credentials.credentials, BEARER_TOKEN):
         raise HTTPException(status_code=401, detail="Invalid or missing token")
     return credentials
 
