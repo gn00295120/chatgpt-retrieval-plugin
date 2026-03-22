@@ -22,7 +22,8 @@ from models.models import DocumentMetadata, Source
 
 bearer_scheme = HTTPBearer()
 BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
-assert BEARER_TOKEN is not None
+if not BEARER_TOKEN:
+    raise ValueError("BEARER_TOKEN environment variable is not set")
 
 
 def validate_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):

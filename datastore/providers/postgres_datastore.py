@@ -112,27 +112,31 @@ class PostgresClient(PGClient):
         Deletes rows in the table that match the filter.
         """
 
-        filters = "WHERE"
+        conditions = []
         params = []
         if filter.document_id:
-            filters += " document_id = %s AND"
+            conditions.append("document_id = %s")
             params.append(filter.document_id)
         if filter.source:
-            filters += " source = %s AND"
+            conditions.append("source = %s")
             params.append(filter.source)
         if filter.source_id:
-            filters += " source_id = %s AND"
+            conditions.append("source_id = %s")
             params.append(filter.source_id)
         if filter.author:
-            filters += " author = %s AND"
+            conditions.append("author = %s")
             params.append(filter.author)
         if filter.start_date:
-            filters += " created_at >= %s AND"
+            conditions.append("created_at >= %s")
             params.append(filter.start_date)
         if filter.end_date:
-            filters += " created_at <= %s AND"
+            conditions.append("created_at <= %s")
             params.append(filter.end_date)
-        filters = filters[:-4]
+
+        if not conditions:
+            return
+
+        filters = "WHERE " + " AND ".join(conditions)
 
         with self.client.cursor() as cur:
             cur.execute(f"DELETE FROM {table} {filters}", params)
